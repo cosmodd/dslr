@@ -1,20 +1,22 @@
-from argparse import ArgumentParser
+import os
 
 import pandas as pd
 from matplotlib import pyplot as plt
 
+parent_path = os.path.dirname(os.path.realpath(__file__))
+dataset_path = os.path.join(parent_path, '../datasets/dataset_train.csv')
+
+house_colors = {
+    'Ravenclaw': '#222f5b',
+    'Slytherin': '#2a623d',
+    'Gryffindor': '#ae0001',
+    'Hufflepuff': '#f0c75e'
+}
 
 def plot_histogram(df: pd.DataFrame):
     drop_cols = ["Index", "Hogwarts House", "First Name", "Last Name", "Birthday", "Best Hand"]
     features = df.drop(columns=drop_cols, errors="ignore").columns
     houses = df["Hogwarts House"].unique()
-
-    house_colors = {
-        'Ravenclaw': '#222f5b',
-        'Slytherin': '#2a623d',
-        'Gryffindor': '#ae0001',
-        'Hufflepuff': '#f0c75e'
-    }
 
     fig, axes = plt.subplots(4, 4, figsize=(16, 9))
     axes = axes.flatten()
@@ -24,7 +26,7 @@ def plot_histogram(df: pd.DataFrame):
         for house in houses:
             df.loc[df["Hogwarts House"] == house, feature].plot.hist(
                 ax=ax,
-                bins=50,
+                bins=25,
                 alpha=0.75,
                 color=house_colors[house],
                 label=house
@@ -40,14 +42,8 @@ def plot_histogram(df: pd.DataFrame):
     plt.show()
 
 def main():
-    parser = ArgumentParser(
-        prog='histogram.py',
-        description='Plot histogram.'
-    )
-    parser.add_argument('filepath', help='Path to CSV file')
-    args = parser.parse_args()
-
-    csv_data = pd.read_csv(args.filepath)
+    csv_data = pd.read_csv(dataset_path)
+    csv_data.set_index('Index', inplace=True)
     plot_histogram(csv_data)
 
 if __name__ == '__main__':
