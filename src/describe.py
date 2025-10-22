@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 import pandas as pd
 
-from operations import count, mean, std, min, max, percentile
+from operations import count, mean, std, min, max, percentile, mode
 
 
 def filter_columns(df: pd.DataFrame) -> pd.DataFrame:
@@ -12,20 +12,25 @@ def filter_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def describe(df: pd.DataFrame) -> pd.DataFrame:
-    rows = ['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max']
+    rows = ['count', 'mean', 'std', 'mode', 'min', '10%', '25%', '50%', '75%', '90%', 'max']
     result = pd.DataFrame(index=rows)
     df = filter_columns(df)
 
     for name, series in df.items():
+        min_val = min(series)
+        max_val = max(series)
         result[name] = None
         result.at['count', name] = count(series)
         result.at['mean', name] = mean(series)
         result.at['std', name] = std(series)
-        result.at['min', name] = min(series)
-        result.at['max', name] = max(series)
+        result.at['mode', name] = mode(series)
+        result.at['min', name] = min_val
+        result.at['max', name] = max_val
+        result.at['10%', name] = percentile(series, 10)
         result.at['25%', name] = percentile(series, 25)
         result.at['50%', name] = percentile(series, 50)
         result.at['75%', name] = percentile(series, 75)
+        result.at['90%', name] = percentile(series, 90)
 
     result = result.map(lambda v: f'{v:.6f}')
     return result.transpose()

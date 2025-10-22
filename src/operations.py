@@ -25,6 +25,11 @@ def sum(s: pd.Series):
 def mean(s: pd.Series) -> float:
     return sum(s) / count(s)
 
+def mode(s: pd.Series):
+    sorted = s.sort_values()
+    value_counts = sorted.value_counts(sort=True, ascending=False)
+    return value_counts.index[0]
+
 def std(s: pd.Series) -> float:
     series_mean = mean(s)
     series_count = count(s)
