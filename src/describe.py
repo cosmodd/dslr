@@ -40,7 +40,6 @@ def main():
     args = parser.parse_args()
 
     csv_data = pd.read_csv(args.filepath)
-    print(csv_data.set_index('Index').describe().transpose())
     print(describe(csv_data))
 
 if __name__ == '__main__':
