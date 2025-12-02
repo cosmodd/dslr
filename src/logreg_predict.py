@@ -2,22 +2,17 @@ import pickle
 import sys
 import pandas as pd
 import numpy as np
+from logreg_train import sigmoid
 
-def sigmoid(z):
-    return 1 / (1 + np.exp(-z))
-
-def load_models(model_path):
+def load_data(dataset_path, model_path):
+    df = pd.read_csv(dataset_path)
+    df = df.set_index('Index')
     with open(model_path, 'rb') as f:
         save_data = pickle.load(f)
     models = save_data['models']
     X_mean = save_data['X_mean']
     X_std = save_data['X_std']
-    return models, X_mean, X_std
-
-def load_data(dataset_path):
-    df = pd.read_csv(dataset_path)
-    df = df.set_index('Index')
-    return df
+    return df, models, X_mean, X_std
 
 def preprocess_data(df):
     best_hand_mapping = {
@@ -35,13 +30,11 @@ def scale_features(X, X_mean, X_std):
 def predict(X_scaled, models):
     m = X_scaled.shape[0]
     num_classes = len(models)
-    probabilities = np.zeros((m, num_classes)) # 2D arrays (columns = classes / rows = students)
-
+    probabilities = np.zeros((m, num_classes)) # 2D array (samples x classes)
     for i, (W, b) in enumerate(models):
         Z = np.dot(X_scaled, W) + b
         A = sigmoid(Z)
         probabilities[:, i] = A
-
     predictions = np.argmax(probabilities, axis=1)
     return predictions
 
@@ -49,20 +42,13 @@ if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage: python logreg_predict.py <model_path> <dataset_path>")
         sys.exit(1)
-
     model_path = sys.argv[1]
     dataset_path = sys.argv[2]
-
-    models, X_mean, X_std = load_models(model_path)
-
-    df = load_data(dataset_path)
+    df, models, X_mean, X_std = load_data(dataset_path, model_path)
     preprocessed_df = preprocess_data(df)
-
     X = preprocessed_df.values
     X_scaled = scale_features(X, X_mean, X_std)
-
     predictions = predict(X_scaled, models)
-
     index_list = preprocessed_df.index.tolist()
     with open('logreg_predictions.txt', 'w') as f:
         f.write("Index,Hogwarts House\n")
