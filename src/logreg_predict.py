@@ -38,7 +38,7 @@ def predict(X_scaled, models):
     predictions = np.argmax(probabilities, axis=1)
     return predictions
 
-if __name__ == "__main__":
+def main():
     if len(sys.argv) != 3:
         print("Usage: python logreg_predict.py <model_path> <dataset_path>")
         sys.exit(1)
@@ -55,3 +55,6 @@ if __name__ == "__main__":
         for idx, pred in zip(index_list, predictions):
             f.write(f"{idx},{['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin'][pred]}\n")
     print("Predictions saved to logreg_predictions.txt")
+
+if __name__ == "__main__":
+    main()

@@ -29,7 +29,9 @@ def preprocess_data(df):
     }
     df['Best Hand'] = df['Best Hand'].map(best_hand_mapping)
     df = df.drop(columns=['First Name', 'Last Name', 'Birthday'])
-    df = df.dropna()
+    # If any NaN values, replace NaN with mean of the column across all samples
+    # df = df.dropna()
+    df = df.fillna(df.mean())
     print(f"----------- Preprocessed Data Preview -----------\n{df.head()}\n-------------------------------------------------")
     return df
 
@@ -89,12 +91,23 @@ def main():
     print(f"Train X shape: {X.shape}, Train Y shape: {Y.shape}")
     # Scale features, train & save models
     X_scaled, X_mean, X_std = scale_features(X)
-    models = train_ovr(X_scaled, Y, learning_rate=0.01, epochs=100000)
+    models = train_ovr(X_scaled, Y, learning_rate=0.1, epochs=100000)
     save_data = {
         'models': models,
         'X_mean': X_mean,
         'X_std': X_std
     }
+    # Test precision on training set
+    m = X_scaled.shape[0]
+    num_classes = len(models)
+    probabilities = np.zeros((m, num_classes))
+    for i, (W, b) in enumerate(models):
+        Z = np.dot(X_scaled, W) + b
+        A = sigmoid(Z)
+        probabilities[:, i] = A
+    predictions = np.argmax(probabilities, axis=1)
+    accuracy = np.mean(predictions == Y)
+    print(f"\nTraining accuracy: {accuracy * 100:.2f}%")
     with open('logreg_models.pkl', 'wb') as f:
         pickle.dump(save_data, f)
     print("Trained models saved to logreg_models.pkl")
