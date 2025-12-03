@@ -45,6 +45,7 @@ def scale_features(X):
 def binary_model(X, Y, learning_rate, epochs):
     """
     Gradient descent to minimize log loss L = - (1/N) * Σ [y * log(a) + (1 - y) * log(1 - a)]
+    Punishes wrong confident predictions more: e.g., predicting 0.99 when true label is 0 gives high loss
     https://community.deeplearning.ai/t/why-mse-is-not-a-good-loss-function-for-logistic-regression/255547
     """
     # Setup: samples m, features n, weights W, bias b
@@ -56,7 +57,9 @@ def binary_model(X, Y, learning_rate, epochs):
         # Linear score (Z = W.X + b) and sigmoid for probs
         Z = np.dot(X, W) + b
         A = sigmoid(Z)
-        # How much L increases w.r.t W and b ? Partial derivatives: Chain rule to find : dW = dL/dA * dA/dZ * dZ/dW | db = dL/dA * dA/dZ * dZ/db
+        # Gradients: dW = (1/m) X^T (A - Y) [chain: dL/dA * dA/dZ * dZ/dW simplifies to this].
+        # db = (1/m) Σ(A - Y) [similar chain for bias].
+        # Tutorial for algebra behind gradients: https://www.youtube.com/watch?v=0VMK18nphpg&list=PLuhqtP7jdD8Chy7QIo5U0zzKP8-emLdny&index=3&t=34s
         dW = (1/m) * np.dot(X.T, (A - Y)) # Transpose data matrix to match dimensions with error vector
         db = (1/m) * np.sum(A - Y)
         # Step opposite gradient
