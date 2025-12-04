@@ -101,16 +101,16 @@ def main():
         'X_std': X_std
     }
     # Test precision on training set
-    m = X_scaled.shape[0]
-    num_classes = len(models)
-    probabilities = np.zeros((m, num_classes))
-    for i, (W, b) in enumerate(models):
-        Z = np.dot(X_scaled, W) + b
-        A = sigmoid(Z)
-        probabilities[:, i] = A
-    predictions = np.argmax(probabilities, axis=1)
-    accuracy = np.mean(predictions == Y)
-    print(f"\nTraining accuracy: {accuracy * 100:.2f}%")
+    # m = X_scaled.shape[0]
+    # num_classes = len(models)
+    # probabilities = np.zeros((m, num_classes))
+    # for i, (W, b) in enumerate(models):
+    #     Z = np.dot(X_scaled, W) + b
+    #     A = sigmoid(Z)
+    #     probabilities[:, i] = A
+    # predictions = np.argmax(probabilities, axis=1)
+    # accuracy = np.mean(predictions == Y)
+    # print(f"\nTraining accuracy: {accuracy * 100:.2f}%")
     with open('logreg_models.pkl', 'wb') as f:
         pickle.dump(save_data, f)
     print("Trained models saved to logreg_models.pkl")
